@@ -1,4 +1,4 @@
-﻿namespace MultithredRest.Services.AppServices
+﻿namespace MultithredRest.Core
 {
     using Microsoft.Extensions.Logging;
 

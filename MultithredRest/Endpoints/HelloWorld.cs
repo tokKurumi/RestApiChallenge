@@ -2,9 +2,9 @@
 {
     using System;
     using System.Net;
-    using System.Text;
+    using System.Threading.Tasks;
+    using MultithreadRest.Helpers;
     using MultithredRest.Core;
-    using Newtonsoft.Json;
 
     public class HelloWorld : EndpointBase
     {
@@ -13,9 +13,9 @@
         {
         }
 
-        protected override ReadOnlySpan<byte> GenerateResponseBuffer(HttpListenerRequest request)
+        public override async Task<ReadOnlyMemory<byte>> GenerateResponse(HttpListenerRequest request)
         {
-            return Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(new { Message = "Hello world!" }, Formatting.Indented));
+            return await new { Message = "Hello world!" }.SerializeJsonAsync();
         }
     }
 }

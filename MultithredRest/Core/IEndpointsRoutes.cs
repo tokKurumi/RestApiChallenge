@@ -1,7 +1,5 @@
-﻿namespace MultithredRest.Services.AppServices
+﻿namespace MultithredRest.Core
 {
-    using MultithredRest.Core;
-
     public interface IEndpointsRoutes
     {
         IDictionary<string, EndpointBase> Instance { get; init; }

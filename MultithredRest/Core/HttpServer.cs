@@ -1,4 +1,4 @@
-﻿namespace MultithredRest.Services.AppServices
+﻿namespace MultithredRest.Core
 {
     using System.Net;
     using Microsoft.Extensions.Logging;
@@ -31,7 +31,7 @@
             IsWorking = true;
             _logger.LogInformation("HttpServer working status changed to {WorkingStatus}", IsWorking);
 
-            HandleIncomingConnections();
+            StartConnectionHandling();
         }
 
         public void Stop()
@@ -65,20 +65,20 @@
             _disposing = true;
         }
 
-        private void HandleIncomingConnections()
+        private void StartConnectionHandling()
+        {
+            Task.Run(HandleIncomingConnectionsAsync);
+        }
+
+        private async Task HandleIncomingConnectionsAsync()
         {
             _logger.LogInformation("HttpServer has started handeling incoming connections");
 
-            Task.Run(async () =>
+            while (IsWorking)
             {
-                while (IsWorking)
-                {
-                    var context = await _listener.GetContextAsync();
-                    context.Response.ContentType = "application/json";
-
-                    await _dispatcher.Dispatch(context);
-                }
-            });
+                var context = await _listener.GetContextAsync();
+                await _dispatcher.Dispatch(context);
+            }
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿namespace MultithredRest.Core
 {
+    using System;
     using System.Collections.Specialized;
     using System.Net;
     using System.Text;
@@ -15,6 +16,8 @@
         public HttpMethod Method { get; init; }
 
         public HttpStatusCode StatusCode { get; set; } = HttpStatusCode.OK;
+
+        public string HttpResponseContentType { get; set; } = "application/json";
 
         public static Dictionary<string, string> DeserializeQuery(NameValueCollection queryString)
         {
@@ -37,21 +40,6 @@
             return JsonConvert.DeserializeObject<T>(jsonRequest);
         }
 
-        public Task<HttpStatusCode> Run(HttpListenerContext context)
-        {
-            var httpContext = context;
-
-            ReadOnlySpan<byte> buffer = GenerateResponseBuffer(httpContext.Request);
-
-            var response = httpContext.Response;
-            response.ContentLength64 = buffer.Length;
-
-            response.OutputStream.Write(buffer);
-            response.StatusCode = (int)StatusCode;
-
-            return Task.FromResult(StatusCode);
-        }
-
-        protected abstract ReadOnlySpan<byte> GenerateResponseBuffer(HttpListenerRequest request);
+        public abstract Task<ReadOnlyMemory<byte>> GenerateResponse(HttpListenerRequest request);
     }
 }

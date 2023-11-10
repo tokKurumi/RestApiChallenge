@@ -1,6 +1,5 @@
-﻿namespace MultithredRest.Services.AppServices
+﻿namespace MultithredRest.Core
 {
-    using MultithredRest.Core;
     using MultithredRest.Endpoints;
 
     public class EndpointsRoutes : IEndpointsRoutes
@@ -10,7 +9,6 @@
             Instance = new SortedDictionary<string, EndpointBase>(StringComparer.OrdinalIgnoreCase)
             {
                 [@"/v1/helloworld"] = new HelloWorld(HttpMethod.Get),
-                [@"/v1/weather"] = new Weather(HttpMethod.Post),
             };
         }
 

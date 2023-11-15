@@ -361,3 +361,7 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+
+# API Keys
+MultithredRest/Resources/Weather/WeatherApi.Designer.cs
+MultithredRest/Resources/Weather/WeatherApi.resx

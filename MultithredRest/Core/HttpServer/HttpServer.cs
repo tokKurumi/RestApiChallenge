@@ -1,7 +1,8 @@
-﻿namespace MultithredRest.Core
+﻿namespace MultithredRest.Core.HttpServer
 {
     using System.Net;
     using Microsoft.Extensions.Logging;
+    using MultithredRest.Core.RequestDispatcher.RequestDispatcher;
 
     public class HttpServer : IHttpServer
     {
@@ -41,6 +42,15 @@
 
             IsWorking = false;
             _logger.LogInformation("HttpServer working status changed to {WorkingStatus}", IsWorking);
+        }
+
+        public void Close()
+        {
+            if (IsWorking)
+            {
+                IsWorking = false;
+                _logger.LogInformation("HttpServer working status changed to {WorkingStatus}", IsWorking);
+            }
 
             _listener.Close();
             _logger.LogInformation("HttpServer has succefully closed connections");
@@ -58,7 +68,7 @@
             {
                 if (disposing)
                 {
-                    Stop();
+                    Close();
                 }
             }
 

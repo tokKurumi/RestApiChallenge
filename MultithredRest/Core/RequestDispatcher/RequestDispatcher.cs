@@ -1,8 +1,10 @@
-﻿namespace MultithredRest.Core
+﻿namespace MultithredRest.Core.RequestDispatcher.RequestDispatcher
 {
     using System.Net;
     using Microsoft.Extensions.Logging;
     using MultithreadRest.Helpers;
+    using MultithredRest.Core.EndpointModel;
+    using MultithredRest.Core.HttpServer;
 
     public class RequestDispatcher : IRequestDispatcher
     {
@@ -26,22 +28,22 @@
                 if (!_endpoints.Instance.ContainsKey(route))
                 {
                     _logger.LogInformation("Dispatcher can not found given endpoint on the route {Route}", route);
-                    return SendResponse(context.Response, await new { NotFound = "404" }.SerializeJsonAsync(), "application/json", HttpStatusCode.NotFound);
+                    SendResponse(context.Response, await new { NotFound = "404" }.SerializeJsonAsync(), "application/json", HttpStatusCode.NotFound);
                 }
 
                 var endpoint = _endpoints.Instance[route];
                 if (endpoint.Method.ToString() != context.Request.HttpMethod)
                 {
                     _logger.LogInformation("Dispatched connection to {Route} with wrong method. Expected {ExpectedRequestMethod}, but given {GivenRequestMethod}", route, endpoint.Method, context.Request.HttpMethod);
-                    return SendResponse(context.Response, await new { MethodNotAllowed = "405" }.SerializeJsonAsync(), "application/json", HttpStatusCode.MethodNotAllowed);
+                    SendResponse(context.Response, await new { MethodNotAllowed = "405" }.SerializeJsonAsync(), "application/json", HttpStatusCode.MethodNotAllowed);
                 }
 
                 _logger.LogInformation("Dispatched connection to {Route}", route);
-                return SendResponse(context.Response, await endpoint.GenerateResponse(context.Request), endpoint.HttpResponseContentType);
+                SendResponse(context.Response, await endpoint.GenerateResponse(new HttpRequestParameters(context.Request)), endpoint.HttpResponseContentType);
             });
         }
 
-        private static HttpStatusCode SendResponse(HttpListenerResponse response, ReadOnlyMemory<byte> buffer, string contentType, HttpStatusCode statusCode = HttpStatusCode.OK)
+        private static void SendResponse(HttpListenerResponse response, ReadOnlyMemory<byte> buffer, string contentType, HttpStatusCode statusCode = HttpStatusCode.OK)
         {
             response.ContentType = contentType;
 
@@ -49,8 +51,6 @@
             response.OutputStream.Write(buffer.Span);
 
             response.StatusCode = (int)statusCode;
-
-            return statusCode;
         }
     }
 }

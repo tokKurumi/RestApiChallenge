@@ -1,6 +1,7 @@
-﻿namespace MultithredRest.Core
+﻿namespace MultithredRest.Core.Application
 {
     using Microsoft.Extensions.Logging;
+    using MultithredRest.Core.HttpServer;
 
     public class Application : IApplication
     {
@@ -15,8 +16,8 @@
 
         public void Run()
         {
-            _server.Start();
             _logger.LogInformation("Application has succefully started");
+            _server.Start();
         }
 
         public void Stop()

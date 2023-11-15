@@ -1,6 +1,12 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using MultithredRest.Core;
+using MultithredRest.Core.Application;
+using MultithredRest.Core.EndpointModel;
+using MultithredRest.Core.HttpServer;
+using MultithredRest.Core.RequestDispatcher.RequestDispatcher;
+using MultithredRest.Endpoints.HelloWorld.HelloWorld;
+using MultithredRest.Endpoints.Weather;
+using MultithredRest.Services;
 
 public class Program
 {
@@ -14,6 +20,13 @@ public class Program
                     .AddSingleton<IHttpServer, HttpServer>()
                     .AddSingleton<IRequestDispatcher, RequestDispatcher>()
                     .AddSingleton<IEndpointsRoutes, EndpointsRoutes>();
+
+                services
+                    .AddSingleton<IHelloWorld, HelloWorld>(provider => new HelloWorld(HttpMethod.Get))
+                    .AddSingleton<IWeather, Weather>(provider => new Weather(HttpMethod.Post, provider.GetRequiredService<IWeatherService>()));
+
+                services
+                    .AddSingleton<IWeatherService, WeatherService>();
             }).Build();
 
         var application = host.Services.GetRequiredService<IApplication>();

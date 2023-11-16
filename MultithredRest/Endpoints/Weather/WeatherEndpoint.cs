@@ -9,15 +9,20 @@
     using MultithredRest.Models.WeatherApi;
     using MultithredRest.Services;
 
-    public class Weather : EndpointBase, IWeather
+    public class WeatherEndpoint : EndpointBase
     {
         private IWeatherService _weatherService;
 
-        public Weather(HttpMethod method, IWeatherService weatherService)
-            : base(method)
+        public WeatherEndpoint(IWeatherService weatherService)
         {
             _weatherService = weatherService;
         }
+
+        public override HttpMethod Method => HttpMethod.Post;
+
+        public override string Route => @"/weather";
+
+        public override string HttpResponseContentType => "application/json";
 
         public override async Task<ReadOnlyMemory<byte>> GenerateResponse(HttpRequestParameters requestParametres)
         {

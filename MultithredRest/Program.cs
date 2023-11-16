@@ -22,8 +22,8 @@ public class Program
                     .AddSingleton<IEndpointsRoutes, EndpointsRoutes>();
 
                 services
-                    .AddSingleton<IHelloWorld, HelloWorld>(provider => new HelloWorld(HttpMethod.Get))
-                    .AddSingleton<IWeather, Weather>(provider => new Weather(HttpMethod.Post, provider.GetRequiredService<IWeatherService>()));
+                    .AddSingleton<EndpointBase, HelloWorldEndpoint>()
+                    .AddSingleton<EndpointBase, WeatherEndpoint>();
 
                 services
                     .AddSingleton<IWeatherService, WeatherService>();

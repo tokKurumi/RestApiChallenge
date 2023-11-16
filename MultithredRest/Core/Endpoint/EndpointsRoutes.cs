@@ -1,22 +1,19 @@
 ﻿namespace MultithredRest.Core.EndpointModel
 {
-    using Microsoft.Extensions.DependencyInjection;
-    using MultithredRest.Endpoints.HelloWorld.HelloWorld;
-    using MultithredRest.Endpoints.Weather;
-
     public class EndpointsRoutes : IEndpointsRoutes
     {
-        private IServiceProvider _serviceProvider;
+        private List<EndpointBase> _endpoints;
 
-        public EndpointsRoutes(IServiceProvider serviceProvider)
+        public EndpointsRoutes(IEnumerable<EndpointBase> endpoints)
         {
-            _serviceProvider = serviceProvider;
+            _endpoints = new List<EndpointBase>(endpoints);
 
-            Instance = new SortedDictionary<string, EndpointBase>(StringComparer.OrdinalIgnoreCase)
+            Instance = new SortedDictionary<string, EndpointBase>(StringComparer.OrdinalIgnoreCase);
+
+            foreach (var endpoint in _endpoints)
             {
-                [@"/helloworld"] = _serviceProvider.GetRequiredService<IHelloWorld>() as EndpointBase,
-                [@"/weather"] = _serviceProvider.GetRequiredService<IWeather>() as EndpointBase,
-            };
+                Instance[endpoint.Route] = endpoint;
+            }
         }
 
         public IDictionary<string, EndpointBase> Instance { get; init; }

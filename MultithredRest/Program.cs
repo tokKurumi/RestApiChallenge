@@ -24,7 +24,8 @@ public class Program
                     .AddSingleton<EndpointBase, HelloWorldEndpoint>()
                     .AddSingleton<EndpointBase, WeatherEndpoint>()
                     .AddSingleton<EndpointBase, DynamicExecuteEndpoint>()
-                    .AddSingleton<EndpointBase, SayHiEndpoint>();
+                    .AddSingleton<EndpointBase, SayHiEndpoint>()
+                    .AddSingleton<EndpointBase, DynamicFromFileEndpoint>();
 
                 services
                     .AddSingleton<IWeatherService, WeatherService>();

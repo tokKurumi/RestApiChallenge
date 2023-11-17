@@ -8,6 +8,7 @@
     using MultithredRest.Core.EndpointModel;
     using MultithredRest.Core.HttpServer;
     using MultithredRest.Core.RequestDispatcher.RequestDispatcher;
+    using MultithredRest.Helpers;
 
     public class DynamicExecuteEndpoint : EndpointBase
     {
@@ -35,7 +36,7 @@
                 var results = new List<ReadOnlyMemory<byte>>();
                 foreach (var parsedRequest in parsedRequests)
                 {
-                    results.Add((await RequestDispatcher.DispatchAsync(new HttpRequest(parsedRequest, request))).Buffer);
+                    results.Add((await RequestDispatcher.DispatchAsync(parsedRequest.ToHttpRequest(request))).Buffer);
                 }
 
                 return ConcatenateReadOnlyMemories(results, request.ContentEncoding.GetBytes("["), request.ContentEncoding.GetBytes(","), request.ContentEncoding.GetBytes("]"));

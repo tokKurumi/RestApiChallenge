@@ -3,36 +3,20 @@
     using System.Net;
     using System.Text;
     using System.Text.Json;
-    using MultithredRest.Helpers;
 
     public class HttpRequest
     {
-        public HttpRequest(HttpDynamicRequest dynamicEndpointRequest, HttpRequest originalRequest)
+        public HttpRequest()
         {
-            Route = dynamicEndpointRequest.Route;
-            ContentEncoding = Encoding.GetEncoding(dynamicEndpointRequest.ContentEncoding);
-            ContentLength64 = dynamicEndpointRequest.Body.Length;
-            UserHostAddress = originalRequest.UserHostAddress;
-            Cookies = dynamicEndpointRequest.Cookies;
-            Headers = dynamicEndpointRequest.Headers;
-            HttpMethod = dynamicEndpointRequest.HttpMethod;
-            QueryParameters = dynamicEndpointRequest.QueryParameters;
-
-            BodyBytes = ReadBodyBytes(dynamicEndpointRequest.Body, ContentEncoding);
-        }
-
-        public HttpRequest(HttpListenerRequest request)
-        {
-            Route = request.Url?.AbsolutePath ?? string.Empty;
-            ContentEncoding = request.ContentEncoding;
-            ContentLength64 = request.ContentLength64;
-            UserHostAddress = request.UserHostAddress;
-            Cookies = request.Cookies;
-            Headers = request.Headers.ToDictionary();
-            HttpMethod = new HttpMethod(request.HttpMethod);
-            QueryParameters = request.QueryString.ToDictionary();
-
-            BodyBytes = ReadBodyBytes(request.InputStream, (int)ContentLength64);
+            Route = string.Empty;
+            ContentEncoding = Encoding.Default;
+            ContentLength64 = 0;
+            UserHostAddress = string.Empty;
+            Cookies = new CookieCollection();
+            Headers = new Dictionary<string, string>();
+            HttpMethod = HttpMethod.Get;
+            QueryParameters = new Dictionary<string, string>();
+            BodyBytes = Array.Empty<byte>();
         }
 
         public string Route { get; init; }
@@ -58,18 +42,6 @@
             using var memoryStream = new MemoryStream(BodyBytes);
 
             return await JsonSerializer.DeserializeAsync<T>(memoryStream, cancellationToken: cancellationToken) ?? throw new InvalidOperationException("Deserialization failed.");
-        }
-
-        private static byte[] ReadBodyBytes(Stream bodyStream, int capacity)
-        {
-            using var memoryStream = new MemoryStream(capacity);
-            bodyStream.CopyTo(memoryStream);
-            return memoryStream.ToArray();
-        }
-
-        private static byte[] ReadBodyBytes(string body, Encoding encoding)
-        {
-            return encoding.GetBytes(body);
         }
     }
 }

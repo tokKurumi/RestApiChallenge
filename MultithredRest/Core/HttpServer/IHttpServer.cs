@@ -8,7 +8,7 @@
 
         int Port { get; init; }
 
-        void Start();
+        Task StartAsync();
 
         void Stop();
     }

@@ -17,7 +17,7 @@
         public void Run()
         {
             _logger.LogInformation("Application has succefully started");
-            _server.Start();
+            _server.StartAsync();
         }
 
         public void Stop()

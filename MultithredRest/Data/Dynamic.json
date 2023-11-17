@@ -1,0 +1,20 @@
+[
+    {
+        "Route": "/weather",
+        "ContentEncoding": "utf-8",
+        "HttpMethod": {
+            "Method": "Post"
+        },
+        "Body": "{\"Postcode\": \"430001\", \"CountryCode\": \"RU\"}"
+    },
+    {
+        "Route": "/sayhi",
+        "ContentEncoding": "utf-8",
+        "HttpMethod": {
+            "Method": "Get"
+        },
+        "QueryParameters": {
+            "name": "Oleg"
+        }
+    }
+]

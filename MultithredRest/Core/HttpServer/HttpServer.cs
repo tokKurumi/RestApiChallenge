@@ -3,6 +3,7 @@
     using System.Net;
     using Microsoft.Extensions.Logging;
     using MultithredRest.Core.RequestDispatcher.RequestDispatcher;
+    using MultithredRest.Helpers;
 
     public class HttpServer : IHttpServer
     {
@@ -23,7 +24,7 @@
 
         public bool IsWorking { get; private set; } = false;
 
-        public void Start()
+        public async Task StartAsync()
         {
             _listener.Prefixes.Add(@$"{Host}:{Port}/");
             _listener.Start();
@@ -32,7 +33,7 @@
             IsWorking = true;
             _logger.LogInformation("HttpServer working status changed to {WorkingStatus}", IsWorking);
 
-            StartConnectionHandling();
+            await StartConnectionHandlingAsync();
         }
 
         public void Stop()
@@ -75,25 +76,31 @@
             _disposing = true;
         }
 
-        private void StartConnectionHandling()
-        {
-            Task.Run(HandleIncomingConnectionsAsync);
-        }
-
-        private async Task HandleIncomingConnectionsAsync()
+        private async Task StartConnectionHandlingAsync()
         {
             _logger.LogInformation("HttpServer has started handeling incoming connections");
 
             while (IsWorking)
             {
                 var context = await _listener.GetContextAsync();
+                _ = Task.Run(() => HandleRequestAsync(context));
+            }
+        }
 
-                var result = await _dispatcher.DispatchAsync(new HttpRequest(context.Request));
+        private async Task HandleRequestAsync(HttpListenerContext context)
+        {
+            try
+            {
+                var result = await _dispatcher.DispatchAsync(context.Request.ToHttpRequest()).ConfigureAwait(false);
 
                 context.Response.ContentType = result.ContentType;
                 context.Response.ContentLength64 = result.Buffer.Length;
                 context.Response.StatusCode = (int)result.StatusCode;
-                await context.Response.OutputStream.WriteAsync(result.Buffer);
+                await context.Response.OutputStream.WriteAsync(result.Buffer).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error handling request");
             }
         }
     }

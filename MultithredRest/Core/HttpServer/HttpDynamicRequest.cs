@@ -4,18 +4,29 @@
 
     public class HttpDynamicRequest
     {
-        public string Route { get; set; } = string.Empty;
+        public HttpDynamicRequest()
+        {
+            Route = string.Empty;
+            ContentEncoding = string.Empty;
+            Cookies = new CookieCollection();
+            Headers = new Dictionary<string, string>();
+            HttpMethod = HttpMethod.Get;
+            QueryParameters = new Dictionary<string, string>();
+            Body = string.Empty;
+        }
 
-        public string ContentEncoding { get; set; } = string.Empty;
+        public string Route { get; set; }
 
-        public CookieCollection Cookies { get; set; } = new CookieCollection();
+        public string ContentEncoding { get; set; }
 
-        public Dictionary<string, string> Headers { get; set; } = new Dictionary<string, string>();
+        public CookieCollection Cookies { get; set; }
 
-        public HttpMethod HttpMethod { get; set; } = HttpMethod.Get;
+        public Dictionary<string, string> Headers { get; set; }
 
-        public Dictionary<string, string> QueryParameters { get; set; } = new Dictionary<string, string>();
+        public HttpMethod HttpMethod { get; set; }
 
-        public string Body { get; set; } = string.Empty;
+        public Dictionary<string, string> QueryParameters { get; set; }
+
+        public string Body { get; set; }
     }
 }

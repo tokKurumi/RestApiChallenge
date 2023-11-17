@@ -87,7 +87,13 @@
             while (IsWorking)
             {
                 var context = await _listener.GetContextAsync();
-                await _dispatcher.Dispatch(context);
+
+                var result = await _dispatcher.DispatchAsync(new HttpRequest(context.Request));
+
+                context.Response.ContentType = result.ContentType;
+                context.Response.ContentLength64 = result.Buffer.Length;
+                context.Response.StatusCode = (int)result.StatusCode;
+                await context.Response.OutputStream.WriteAsync(result.Buffer);
             }
         }
     }

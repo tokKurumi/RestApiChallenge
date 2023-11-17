@@ -1,4 +1,4 @@
-﻿namespace MultithredRest.Endpoints.HelloWorld.HelloWorld
+﻿namespace MultithredRest.Endpoints
 {
     using System;
     using System.Net.Http;
@@ -15,7 +15,7 @@
 
         public override string HttpResponseContentType => "application/json";
 
-        public override async Task<ReadOnlyMemory<byte>> GenerateResponse(HttpRequestParameters requestParametres)
+        public override async Task<ReadOnlyMemory<byte>> GenerateResponseAsync(HttpRequest request)
         {
             return await new { Message = "Hello world!" }.SerializeJsonAsync();
         }

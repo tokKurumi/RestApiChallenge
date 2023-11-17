@@ -2,8 +2,8 @@
 {
     public class WeatherParam
     {
-        public string? Postcode { get; set; }
+        public string Postcode { get; set; } = string.Empty;
 
-        public string? CountryCode { get; set; }
+        public string CountryCode { get; set; } = string.Empty;
     }
 }

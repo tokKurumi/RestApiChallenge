@@ -1,4 +1,4 @@
-﻿namespace MultithredRest.Endpoints.Weather
+﻿namespace MultithredRest.Endpoints
 {
     using System;
     using System.Net.Http;
@@ -24,11 +24,17 @@
 
         public override string HttpResponseContentType => "application/json";
 
-        public override async Task<ReadOnlyMemory<byte>> GenerateResponse(HttpRequestParameters requestParametres)
+        public override async Task<ReadOnlyMemory<byte>> GenerateResponseAsync(HttpRequest request)
         {
-            var body = await requestParametres.DeserializeBodyAsync<WeatherParam>();
-
-            return await _weatherService.GetCityWeather(body.Postcode, body.CountryCode).SerializeJsonAsync();
+            try
+            {
+                var body = await request.DeserializeBodyAsync<WeatherParam>();
+                return await _weatherService.GetCityWeather(body.Postcode, body.CountryCode).SerializeJsonAsync();
+            }
+            catch (Exception ex)
+            {
+                return await new { Error = ex.Message }.SerializeJsonAsync();
+            }
         }
     }
 }

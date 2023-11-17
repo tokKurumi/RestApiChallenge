@@ -17,40 +17,29 @@
             _endpoints = endpoints;
         }
 
-        public Task Dispatch(HttpListenerContext context)
+        public async Task<(ReadOnlyMemory<byte> Buffer, HttpStatusCode StatusCode, string ContentType)> DispatchAsync(HttpRequest request)
         {
-            var route = context.Request.Url?.AbsolutePath!;
+            var route = request.Route;
 
-            _logger.LogInformation("Dispatching connection from {IP} to {Route}", context.Request.RemoteEndPoint, route);
+            _logger.LogInformation("Dispatching connection from {IP} to {Route}", request.UserHostAddress, route);
 
-            return Task.Run(async () =>
+            if (!_endpoints.Instance.ContainsKey(route))
             {
-                if (!_endpoints.Instance.ContainsKey(route))
-                {
-                    _logger.LogInformation("Dispatcher can not found given endpoint on the route {Route}", route);
-                    SendResponse(context.Response, await new { NotFound = "404" }.SerializeJsonAsync(), "application/json", HttpStatusCode.NotFound);
-                }
+                _logger.LogInformation("Dispatcher can not found given endpoint on the route {Route}", route);
 
-                var endpoint = _endpoints.Instance[route];
-                if (endpoint.Method.ToString() != context.Request.HttpMethod)
-                {
-                    _logger.LogInformation("Dispatched connection to {Route} with wrong method. Expected {ExpectedRequestMethod}, but given {GivenRequestMethod}", route, endpoint.Method, context.Request.HttpMethod);
-                    SendResponse(context.Response, await new { MethodNotAllowed = "405" }.SerializeJsonAsync(), "application/json", HttpStatusCode.MethodNotAllowed);
-                }
+                return (await new { NotFound = "404" }.SerializeJsonAsync(), HttpStatusCode.NotFound, @"application/json");
+            }
 
-                _logger.LogInformation("Dispatched connection to {Route}", route);
-                SendResponse(context.Response, await endpoint.GenerateResponse(new HttpRequestParameters(context.Request)), endpoint.HttpResponseContentType);
-            });
-        }
+            var endpoint = _endpoints.Instance[route];
+            if (endpoint.Method != request.HttpMethod)
+            {
+                _logger.LogInformation("Dispatched connection to {Route} with wrong method. Expected {ExpectedRequestMethod}, but given {GivenRequestMethod}", route, endpoint.Method, request.HttpMethod);
 
-        private static void SendResponse(HttpListenerResponse response, ReadOnlyMemory<byte> buffer, string contentType, HttpStatusCode statusCode = HttpStatusCode.OK)
-        {
-            response.ContentType = contentType;
+                return (await new { MethodNotAllowed = "405" }.SerializeJsonAsync(), HttpStatusCode.MethodNotAllowed, @"application/json");
+            }
 
-            response.ContentLength64 = buffer.Length;
-            response.OutputStream.Write(buffer.Span);
-
-            response.StatusCode = (int)statusCode;
+            _logger.LogInformation("Dispatched connection to {Route}", route);
+            return (await endpoint.GenerateResponseAsync(request), HttpStatusCode.OK, @"application/json");
         }
     }
 }

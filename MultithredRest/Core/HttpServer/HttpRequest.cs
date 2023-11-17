@@ -5,10 +5,25 @@
     using System.Text.Json;
     using MultithredRest.Helpers;
 
-    public class HttpRequestParameters
+    public class HttpRequest
     {
-        public HttpRequestParameters(HttpListenerRequest request)
+        public HttpRequest(HttpDynamicRequest dynamicEndpointRequest, HttpRequest originalRequest)
         {
+            Route = dynamicEndpointRequest.Route;
+            ContentEncoding = Encoding.GetEncoding(dynamicEndpointRequest.ContentEncoding);
+            ContentLength64 = dynamicEndpointRequest.Body.Length;
+            UserHostAddress = originalRequest.UserHostAddress;
+            Cookies = dynamicEndpointRequest.Cookies;
+            Headers = dynamicEndpointRequest.Headers;
+            HttpMethod = dynamicEndpointRequest.HttpMethod;
+            QueryParameters = dynamicEndpointRequest.QueryParameters;
+
+            BodyBytes = ReadBodyBytes(dynamicEndpointRequest.Body, ContentEncoding);
+        }
+
+        public HttpRequest(HttpListenerRequest request)
+        {
+            Route = request.Url?.AbsolutePath ?? string.Empty;
             ContentEncoding = request.ContentEncoding;
             ContentLength64 = request.ContentLength64;
             UserHostAddress = request.UserHostAddress;
@@ -19,6 +34,8 @@
 
             BodyBytes = ReadBodyBytes(request.InputStream, (int)ContentLength64);
         }
+
+        public string Route { get; init; }
 
         public Encoding ContentEncoding { get; init; }
 
@@ -34,13 +51,13 @@
 
         public Dictionary<string, string> QueryParameters { get; init; }
 
-        protected byte[] BodyBytes { get; init; }
+        public byte[] BodyBytes { get; init; }
 
-        public async Task<T?> DeserializeBodyAsync<T>(CancellationToken cancellationToken = default)
+        public async Task<T> DeserializeBodyAsync<T>(CancellationToken cancellationToken = default)
         {
             using var memoryStream = new MemoryStream(BodyBytes);
 
-            return await JsonSerializer.DeserializeAsync<T>(memoryStream, cancellationToken: cancellationToken);
+            return await JsonSerializer.DeserializeAsync<T>(memoryStream, cancellationToken: cancellationToken) ?? throw new InvalidOperationException("Deserialization failed.");
         }
 
         private static byte[] ReadBodyBytes(Stream bodyStream, int capacity)
@@ -48,6 +65,11 @@
             using var memoryStream = new MemoryStream(capacity);
             bodyStream.CopyTo(memoryStream);
             return memoryStream.ToArray();
+        }
+
+        private static byte[] ReadBodyBytes(string body, Encoding encoding)
+        {
+            return encoding.GetBytes(body);
         }
     }
 }

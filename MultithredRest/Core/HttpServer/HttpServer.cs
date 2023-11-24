@@ -9,7 +9,7 @@
     {
         private readonly IRequestDispatcher _dispatcher;
         private readonly ILogger<HttpServer> _logger;
-        private HttpListener _listener = new HttpListener();
+        private readonly HttpListener _listener = new HttpListener(); // k3s
         private bool _disposing = false;
 
         public HttpServer(IRequestDispatcher dispatcher, ILogger<HttpServer> logger)
@@ -57,7 +57,7 @@
             _logger.LogInformation("HttpServer has succefully closed connections");
         }
 
-        public void Dispose()
+        public void Dispose() // dispose паттерн
         {
             Dispose(true);
             GC.SuppressFinalize(this);
@@ -80,7 +80,7 @@
         {
             _logger.LogInformation("HttpServer has started handeling incoming connections");
 
-            while (IsWorking)
+            while (IsWorking) // в очередь
             {
                 var context = await _listener.GetContextAsync();
                 _ = Task.Run(() => HandleRequestAsync(context));

@@ -4,9 +4,11 @@
     using System.Net.Http;
     using System.Threading.Tasks;
     using MultithreadRest.Helpers;
+    using MultithredRest.Core.Attributes;
     using MultithredRest.Core.EndpointModel;
     using MultithredRest.Core.HttpServer;
 
+    [RegistrateEndpoint]
     public class SayHiEndpoint : EndpointBase
     {
         public override string Route => @"/sayhi";
@@ -15,18 +17,11 @@
 
         public override string HttpResponseContentType => "application/json";
 
-        public override async Task<ReadOnlyMemory<byte>> GenerateResponseAsync(HttpRequest request)
+        public override async Task<ReadOnlyMemory<byte>> GenerateResponseAsync(HttpRequest request, CancellationToken cancellationToken = default)
         {
-            try
-            {
-                var name = request.QueryParameters["name"];
+            var name = request.QueryParameters["name"];
 
-                return await new { Message = $"Hello, dear {name}" }.SerializeJsonAsync();
-            }
-            catch (Exception ex)
-            {
-                return await new { Error = ex.Message }.SerializeJsonAsync();
-            }
+            return await new { Message = $"Hello, dear {name}" }.SerializeJsonAsync(cancellationToken);
         }
     }
 }

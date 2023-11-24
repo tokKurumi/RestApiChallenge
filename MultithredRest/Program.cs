@@ -4,7 +4,7 @@ using MultithredRest.Core.Application;
 using MultithredRest.Core.EndpointModel;
 using MultithredRest.Core.HttpServer;
 using MultithredRest.Core.RequestDispatcher.RequestDispatcher;
-using MultithredRest.Endpoints;
+using MultithredRest.Helpers;
 using MultithredRest.Services;
 
 public class Program
@@ -21,11 +21,7 @@ public class Program
                     .AddSingleton<IEndpointsRoutes, EndpointsRoutes>();
 
                 services
-                    .AddSingleton<EndpointBase, HelloWorldEndpoint>()
-                    .AddSingleton<EndpointBase, WeatherEndpoint>()
-                    .AddSingleton<EndpointBase, DynamicExecuteEndpoint>()
-                    .AddSingleton<EndpointBase, SayHiEndpoint>()
-                    .AddSingleton<EndpointBase, DynamicFromFileEndpoint>();
+                    .AddEndpoints();
 
                 services
                     .AddSingleton<IWeatherService, WeatherService>();

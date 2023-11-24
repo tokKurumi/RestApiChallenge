@@ -4,11 +4,13 @@
     using System.Net.Http;
     using System.Threading.Tasks;
     using MultithreadRest.Helpers;
+    using MultithredRest.Core.Attributes;
     using MultithredRest.Core.EndpointModel;
     using MultithredRest.Core.HttpServer;
     using MultithredRest.Models.WeatherApi;
     using MultithredRest.Services;
 
+    [RegistrateEndpoint]
     public class WeatherEndpoint : EndpointBase
     {
         private IWeatherService _weatherService;
@@ -24,17 +26,11 @@
 
         public override string HttpResponseContentType => "application/json";
 
-        public override async Task<ReadOnlyMemory<byte>> GenerateResponseAsync(HttpRequest request)
+        public override async Task<ReadOnlyMemory<byte>> GenerateResponseAsync(HttpRequest request, CancellationToken cancellationToken = default)
         {
-            try
-            {
-                var body = await request.DeserializeBodyAsync<WeatherParam>();
-                return await _weatherService.GetCityWeather(body.Postcode, body.CountryCode).SerializeJsonAsync();
-            }
-            catch (Exception ex)
-            {
-                return await new { Error = ex.Message }.SerializeJsonAsync();
-            }
+            var body = await request.DeserializeBodyAsync<WeatherParam>(cancellationToken);
+
+            return await _weatherService.GetCityWeather(body.Postcode, body.CountryCode).SerializeJsonAsync(cancellationToken);
         }
     }
 }

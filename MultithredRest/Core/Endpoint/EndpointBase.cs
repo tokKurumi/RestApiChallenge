@@ -11,6 +11,6 @@
 
         public abstract string HttpResponseContentType { get; }
 
-        public abstract Task<ReadOnlyMemory<byte>> GenerateResponseAsync(HttpRequest request);
+        public abstract Task<ReadOnlyMemory<byte>> GenerateResponseAsync(HttpRequest request, CancellationToken cancellationToken = default);
     }
 }

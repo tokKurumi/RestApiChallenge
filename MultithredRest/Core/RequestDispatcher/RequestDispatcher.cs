@@ -5,6 +5,7 @@
     using MultithreadRest.Helpers;
     using MultithredRest.Core.EndpointModel;
     using MultithredRest.Core.HttpServer;
+    using MultithredRest.Core.SpecialResponses;
 
     public class RequestDispatcher : IRequestDispatcher
     {
@@ -27,19 +28,27 @@
             {
                 _logger.LogInformation("Dispatcher can not found given endpoint on the route {Route}", route);
 
-                return (await new { NotFound = "404" }.SerializeJsonAsync(), HttpStatusCode.NotFound, @"application/json");
+                return (await new NotFoundResponse(request).SerializeJsonAsync(), HttpStatusCode.NotFound, @"application/json");
             }
 
             var endpoint = _endpoints.Instance[route];
             if (endpoint.Method != request.HttpMethod)
             {
-                _logger.LogInformation("Dispatched connection to {Route} with wrong method. Expected {ExpectedRequestMethod}, but given {GivenRequestMethod}", route, endpoint.Method, request.HttpMethod);
+                _logger.LogInformation("Dispatched connection to {Endpoint} with wrong method. Expected {ExpectedRequestMethod}, but given {GivenRequestMethod}", endpoint, endpoint.Method, request.HttpMethod);
 
-                return (await new { MethodNotAllowed = "405" }.SerializeJsonAsync(), HttpStatusCode.MethodNotAllowed, @"application/json");
+                return (await new MethodNotAllowedResponse(request, endpoint).SerializeJsonAsync(), HttpStatusCode.MethodNotAllowed, @"application/json");
             }
 
-            _logger.LogInformation("Dispatched connection to {Route}", route);
-            return (await endpoint.GenerateResponseAsync(request), HttpStatusCode.OK, @"application/json");
+            try
+            {
+                _logger.LogInformation("Dispatched connection to {Endpoint}", endpoint);
+                return (await endpoint.GenerateResponseAsync(request), HttpStatusCode.OK, endpoint.HttpResponseContentType);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Internal server error in {Endpoint}", endpoint);
+                return (await new InternalServerErrorResponse(request, endpoint, ex).SerializeJsonAsync(), HttpStatusCode.InternalServerError, @"application/json");
+            }
         }
     }
 }

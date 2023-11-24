@@ -31,10 +31,10 @@
 
         public override async Task<ReadOnlyMemory<byte>> GenerateResponseAsync(HttpRequest request, CancellationToken cancellationToken = default)
         {
-            var parsedRequests = await request.DeserializeBodyAsync<List<HttpDynamicRequest>>(cancellationToken);
+            var parsedRequests = request.DeserializeEnumerableBodyAsync<HttpDynamicRequest>(cancellationToken);
 
             var results = new List<ReadOnlyMemory<byte>>();
-            foreach (var parsedRequest in parsedRequests)
+            await foreach (var parsedRequest in parsedRequests)
             {
                 results.Add((await RequestDispatcher.DispatchAsync(parsedRequest.ToHttpRequest(request))).Buffer);
             }

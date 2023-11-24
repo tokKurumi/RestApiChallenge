@@ -1,6 +1,7 @@
 ﻿namespace MultithredRest.Core.HttpServer
 {
     using System.Net;
+    using System.Runtime.CompilerServices;
     using System.Text;
     using System.Text.Json;
 
@@ -42,6 +43,18 @@
             using var memoryStream = new MemoryStream(BodyBytes);
 
             return await JsonSerializer.DeserializeAsync<T>(memoryStream, cancellationToken: cancellationToken) ?? throw new InvalidOperationException("Deserialization failed.");
+        }
+
+        public async IAsyncEnumerable<T?> DeserializeEnumerableBodyAsync<T>([EnumeratorCancellation] CancellationToken cancellationToken = default)
+        {
+            var memoryStream = new MemoryStream(BodyBytes);
+
+            await foreach (var item in JsonSerializer.DeserializeAsyncEnumerable<T>(memoryStream, cancellationToken: cancellationToken))
+            {
+                yield return item;
+            }
+
+            memoryStream.Dispose();
         }
     }
 }

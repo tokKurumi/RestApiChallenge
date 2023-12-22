@@ -1,11 +1,11 @@
-﻿namespace MultithredRest.Core.RequestDispatcher.RequestDispatcher
+﻿namespace MultithredRest.Core.RequestDispatcher
 {
     using System.Net;
     using Microsoft.Extensions.Logging;
-    using MultithreadRest.Helpers;
-    using MultithredRest.Core.EndpointModel;
+    using MultithredRest.Core.Endpoint;
     using MultithredRest.Core.HttpServer;
     using MultithredRest.Core.SpecialResponses;
+    using MultithredRest.Helpers;
 
     public class RequestDispatcher : IRequestDispatcher
     {
@@ -24,14 +24,13 @@
 
             _logger.LogInformation("Dispatching connection from {IP} to {Route}", request.UserHostAddress, route);
 
-            if (!_endpoints.Instance.ContainsKey(route))
+            if (!_endpoints.Instance.TryGetValue(route, out var endpoint))
             {
                 _logger.LogInformation("Dispatcher can not found given endpoint on the route {Route}", route);
 
                 return (await new NotFoundResponse(request).SerializeJsonAsync(), HttpStatusCode.NotFound, @"application/json");
             }
 
-            var endpoint = _endpoints.Instance[route];
             if (endpoint.Method != request.HttpMethod)
             {
                 _logger.LogInformation("Dispatched connection to {Endpoint} with wrong method. Expected {ExpectedRequestMethod}, but given {GivenRequestMethod}", endpoint, endpoint.Method, request.HttpMethod);

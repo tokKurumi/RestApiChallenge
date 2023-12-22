@@ -1,4 +1,4 @@
-﻿namespace MultithredRest.Core.EndpointModel
+﻿namespace MultithredRest.Core.Endpoint
 {
     public interface IEndpointsRoutes
     {

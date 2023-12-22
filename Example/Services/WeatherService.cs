@@ -1,11 +1,11 @@
-﻿namespace MultithredRest.Services
+﻿namespace Example.Services
 {
     using System.Text.Json;
-    using MultithredRest.Models.WeatherApi;
+    using Example.Models.WeatherApi;
 
     public class WeatherService : IDisposable, IWeatherService
     {
-        private HttpClient _api = new HttpClient() { BaseAddress = new Uri(@"https://api.openweathermap.org/") };
+        private readonly HttpClient _api = new HttpClient() { BaseAddress = new Uri(@"https://api.openweathermap.org/") };
         private bool _disposing = false;
 
         public async Task<CityWeather?> GetCityWeather(string postCode, string countryCode, CancellationToken cancellationToken = default)
@@ -18,7 +18,7 @@
             }
 
             return await JsonSerializer.DeserializeAsync<CityWeather>(
-                await cityWeatherResponse.Content.ReadAsStreamAsync(),
+                await cityWeatherResponse.Content.ReadAsStreamAsync(cancellationToken),
                 cancellationToken: cancellationToken);
         }
 

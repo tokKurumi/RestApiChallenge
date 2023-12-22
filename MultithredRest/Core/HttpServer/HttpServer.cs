@@ -2,14 +2,14 @@
 {
     using System.Net;
     using Microsoft.Extensions.Logging;
-    using MultithredRest.Core.RequestDispatcher.RequestDispatcher;
+    using MultithredRest.Core.RequestDispatcher;
     using MultithredRest.Helpers;
 
     public class HttpServer : IHttpServer
     {
         private readonly IRequestDispatcher _dispatcher;
         private readonly ILogger<HttpServer> _logger;
-        private readonly HttpListener _listener = new HttpListener(); // k3s
+        private readonly HttpListener _listener = new HttpListener();
         private bool _disposing = false;
 
         public HttpServer(IRequestDispatcher dispatcher, ILogger<HttpServer> logger)
@@ -18,7 +18,9 @@
             _logger = logger;
         }
 
-        public string Host { get; init; } = @"http://localhost";
+        public string Protocol { get; set; } = @"http";
+
+        public string Host { get; init; } = @"localhost";
 
         public int Port { get; init; } = 8080;
 
@@ -26,7 +28,7 @@
 
         public async Task StartAsync()
         {
-            _listener.Prefixes.Add(@$"{Host}:{Port}/");
+            _listener.Prefixes.Add(@$"{Protocol}://{Host}:{Port}/");
             _listener.Start();
             _logger.LogInformation("HttpServer has succefully started on {Host}:{Port}/", Host, Port);
 
@@ -80,7 +82,7 @@
         {
             _logger.LogInformation("HttpServer has started handeling incoming connections");
 
-            while (IsWorking) // в очередь
+            while (IsWorking)
             {
                 var context = await _listener.GetContextAsync();
                 _ = Task.Run(() => HandleRequestAsync(context));

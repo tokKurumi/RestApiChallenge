@@ -1,14 +1,14 @@
-﻿namespace MultithredRest.Endpoints
+﻿namespace Example.Endpoints
 {
     using System;
     using System.Net.Http;
     using System.Threading.Tasks;
-    using MultithreadRest.Helpers;
+    using Example.Models.WeatherApi;
+    using Example.Services;
     using MultithredRest.Core.Attributes;
-    using MultithredRest.Core.EndpointModel;
+    using MultithredRest.Core.Endpoint;
     using MultithredRest.Core.HttpServer;
-    using MultithredRest.Models.WeatherApi;
-    using MultithredRest.Services;
+    using MultithredRest.Helpers;
 
     [RegistrateEndpoint]
     public class WeatherEndpoint : EndpointBase

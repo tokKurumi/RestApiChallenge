@@ -1,25 +1,27 @@
-﻿namespace MultithredRest.Endpoints
+﻿namespace Example.Endpoints
 {
     using System;
     using System.Net.Http;
     using System.Threading.Tasks;
-    using MultithreadRest.Helpers;
     using MultithredRest.Core.Attributes;
-    using MultithredRest.Core.EndpointModel;
+    using MultithredRest.Core.Endpoint;
     using MultithredRest.Core.HttpServer;
+    using MultithredRest.Helpers;
 
     [RegistrateEndpoint]
-    public class HelloWorldEndpoint : EndpointBase
+    public class SayHiEndpoint : EndpointBase
     {
-        public override HttpMethod Method => HttpMethod.Get;
+        public override string Route => @"/sayhi";
 
-        public override string Route => @"/helloworld";
+        public override HttpMethod Method => HttpMethod.Get;
 
         public override string HttpResponseContentType => "application/json";
 
         public override async Task<ReadOnlyMemory<byte>> GenerateResponseAsync(HttpRequest request, CancellationToken cancellationToken = default)
         {
-            return await new { Message = "Hello world!" }.SerializeJsonAsync(cancellationToken);
+            var name = request.QueryParameters["name"];
+
+            return await new { Message = $"Hello, dear {name}" }.SerializeJsonAsync(cancellationToken);
         }
     }
 }

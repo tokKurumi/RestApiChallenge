@@ -1,6 +1,6 @@
-﻿namespace MultithredRest.Services
+﻿namespace Example.Services
 {
-    using MultithredRest.Models.WeatherApi;
+    using Example.Models.WeatherApi;
 
     public interface IWeatherService
     {

@@ -1,7 +1,7 @@
 ﻿namespace MultithredRest.Core.SpecialResponses
 {
     using System.Net;
-    using MultithredRest.Core.EndpointModel;
+    using MultithredRest.Core.Endpoint;
     using MultithredRest.Core.HttpServer;
 
     public class InternalServerErrorResponse : SpecialResponseBase

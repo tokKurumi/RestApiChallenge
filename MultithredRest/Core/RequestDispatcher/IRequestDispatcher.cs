@@ -1,4 +1,4 @@
-﻿namespace MultithredRest.Core.RequestDispatcher.RequestDispatcher
+﻿namespace MultithredRest.Core.RequestDispatcher
 {
     using System.Net;
     using MultithredRest.Core.HttpServer;

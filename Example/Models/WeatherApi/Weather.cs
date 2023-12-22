@@ -1,4 +1,4 @@
-﻿namespace MultithredRest.Models.WeatherApi
+﻿namespace Example.Models.WeatherApi
 {
     using System.Text.Json.Serialization;
 

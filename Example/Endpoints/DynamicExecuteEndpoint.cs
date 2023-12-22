@@ -1,20 +1,19 @@
-﻿namespace MultithredRest.Endpoints
+﻿namespace Example.Endpoints
 {
     using System;
     using System.Net.Http;
     using System.Threading.Tasks;
     using Microsoft.Extensions.DependencyInjection;
-    using MultithreadRest.Helpers;
     using MultithredRest.Core.Attributes;
-    using MultithredRest.Core.EndpointModel;
+    using MultithredRest.Core.Endpoint;
     using MultithredRest.Core.HttpServer;
-    using MultithredRest.Core.RequestDispatcher.RequestDispatcher;
+    using MultithredRest.Core.RequestDispatcher;
     using MultithredRest.Helpers;
 
     [RegistrateEndpoint]
     public class DynamicExecuteEndpoint : EndpointBase
     {
-        private IServiceProvider _serviceProvider;
+        private readonly IServiceProvider _serviceProvider;
 
         public DynamicExecuteEndpoint(IServiceProvider serviceProvider)
         {
@@ -36,7 +35,11 @@
             var results = new List<ReadOnlyMemory<byte>>();
             await foreach (var parsedRequest in parsedRequests)
             {
-                results.Add((await RequestDispatcher.DispatchAsync(parsedRequest.ToHttpRequest(request))).Buffer);
+                if (parsedRequest is not null)
+                {
+                    results.Add((await RequestDispatcher.DispatchAsync(parsedRequest.ToHttpRequest(request))).Buffer);
+
+                }
             }
 
             return results.ConcatenateReadOnlyMemories(request.ContentEncoding.GetBytes("["), request.ContentEncoding.GetBytes(","), request.ContentEncoding.GetBytes("]"));

@@ -1,4 +1,4 @@
-﻿namespace MultithreadRest.Helpers
+﻿namespace MultithredRest.Helpers
 {
     using System.IO;
     using System.Text.Json;

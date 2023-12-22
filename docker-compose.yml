@@ -1,0 +1,17 @@
+version: '3.4'
+
+services:
+  webserver:
+    container_name: restapichallenge
+    build:
+      context: .
+    ports:
+      - 8080:8080
+    restart: always
+    networks:
+      - backend
+
+networks:
+  backend:
+    name: restapi-backend-network
+    driver: bridge

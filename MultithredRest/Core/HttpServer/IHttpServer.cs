@@ -2,6 +2,8 @@
 {
     public interface IHttpServer : IDisposable
     {
+        string Protocol { get; set; }
+
         string Host { get; init; }
 
         bool IsWorking { get; }

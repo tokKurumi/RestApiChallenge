@@ -1,8 +1,8 @@
-﻿namespace MultithredRest.Core.EndpointModel
+﻿namespace MultithredRest.Core.Endpoint
 {
     public class EndpointsRoutes : IEndpointsRoutes
     {
-        private List<EndpointBase> _endpoints;
+        private readonly List<EndpointBase> _endpoints;
 
         public EndpointsRoutes(IEnumerable<EndpointBase> endpoints)
         {

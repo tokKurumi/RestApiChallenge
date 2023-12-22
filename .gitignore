@@ -363,5 +363,4 @@ MigrationBackup/
 FodyWeavers.xsd
 
 # API Keys
-MultithredRest/Resources/Weather/WeatherApi.Designer.cs
-MultithredRest/Resources/Weather/WeatherApi.resx
+Example/Resources/Weather/

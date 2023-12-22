@@ -1,9 +1,9 @@
-﻿namespace MultithredRest.Helpers
+﻿namespace MultithredRest.HostDefaults
 {
     using System.Reflection;
     using Microsoft.Extensions.DependencyInjection;
     using MultithredRest.Core.Attributes;
-    using MultithredRest.Core.EndpointModel;
+    using MultithredRest.Core.Endpoint;
 
     public static class AddEndpointsExtensions
     {
@@ -11,10 +11,15 @@
         {
             var endpointBaseType = typeof(EndpointBase);
 
-            var typesWithSingletonAttribute = Assembly.GetExecutingAssembly().GetTypes()
+            var typesWithSingletonAttribute = Assembly
+                .GetEntryAssembly()
+                ?.GetTypes()
                 .Where(type =>
-                    endpointBaseType.IsAssignableFrom(type) &&
-                    type.GetCustomAttributes(typeof(RegistrateEndpointAttribute), true).Length > 0);
+                {
+                    return
+                        endpointBaseType.IsAssignableFrom(type)
+                        && type.GetCustomAttributes(typeof(RegistrateEndpointAttribute), true).Length > 0;
+                }) ?? Enumerable.Empty<Type>();
 
             foreach (var type in typesWithSingletonAttribute)
             {

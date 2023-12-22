@@ -1,12 +1,11 @@
-﻿namespace MultithredRest.Endpoints
+﻿namespace Example.Endpoints
 {
     using System.Text.Json;
     using Microsoft.Extensions.DependencyInjection;
-    using MultithreadRest.Helpers;
     using MultithredRest.Core.Attributes;
-    using MultithredRest.Core.EndpointModel;
+    using MultithredRest.Core.Endpoint;
     using MultithredRest.Core.HttpServer;
-    using MultithredRest.Core.RequestDispatcher.RequestDispatcher;
+    using MultithredRest.Core.RequestDispatcher;
     using MultithredRest.Helpers;
 
     [RegistrateEndpoint]

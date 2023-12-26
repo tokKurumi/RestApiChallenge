@@ -1,11 +1,10 @@
 ﻿namespace MultithredRest.Core.RequestDispatcher
 {
-    using System.Net;
     using Microsoft.Extensions.Logging;
     using MultithredRest.Core.Endpoint;
     using MultithredRest.Core.HttpServer;
+    using MultithredRest.Core.Result;
     using MultithredRest.Core.SpecialResponses;
-    using MultithredRest.Helpers;
 
     public class RequestDispatcher : IRequestDispatcher
     {
@@ -18,7 +17,7 @@
             _endpoints = endpoints;
         }
 
-        public async Task<(ReadOnlyMemory<byte> Buffer, HttpStatusCode StatusCode, string ContentType)> DispatchAsync(HttpRequest request)
+        public async Task<IActionResult> DispatchAsync(HttpRequest request)
         {
             var route = request.Route;
 
@@ -28,25 +27,26 @@
             {
                 _logger.LogInformation("Dispatcher can not found given endpoint on the route {Route}", route);
 
-                return (await new NotFoundResponse(request).SerializeJsonAsync(), HttpStatusCode.NotFound, @"application/json");
+                return await ActionResult.InitializeAsync(new NotFound(request));
             }
 
             if (endpoint.Method != request.HttpMethod)
             {
                 _logger.LogInformation("Dispatched connection to {Endpoint} with wrong method. Expected {ExpectedRequestMethod}, but given {GivenRequestMethod}", endpoint, endpoint.Method, request.HttpMethod);
 
-                return (await new MethodNotAllowedResponse(request, endpoint).SerializeJsonAsync(), HttpStatusCode.MethodNotAllowed, @"application/json");
+                return await ActionResult.InitializeAsync(new MethodNotAllowed(request, endpoint));
             }
 
             try
             {
                 _logger.LogInformation("Dispatched connection to {Endpoint}", endpoint);
-                return (await endpoint.GenerateResponseAsync(request), HttpStatusCode.OK, endpoint.HttpResponseContentType);
+                return await endpoint.GenerateResponseAsync(request);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Internal server error in {Endpoint}", endpoint);
-                return (await new InternalServerErrorResponse(request, endpoint, ex).SerializeJsonAsync(), HttpStatusCode.InternalServerError, @"application/json");
+
+                return await ActionResult.InitializeAsync(new InternalServerError(request, endpoint, ex));
             }
         }
     }

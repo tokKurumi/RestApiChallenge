@@ -3,9 +3,9 @@
     using System.Net;
     using MultithredRest.Core.HttpServer;
 
-    public class NotFoundResponse : SpecialResponseBase
+    public class NotFound : SpecialResponseBase
     {
-        public NotFoundResponse(HttpRequest request)
+        public NotFound(HttpRequest request)
         {
             Route = request.Route;
 

@@ -1,10 +1,10 @@
 ﻿namespace MultithredRest.Core.RequestDispatcher
 {
-    using System.Net;
     using MultithredRest.Core.HttpServer;
+    using MultithredRest.Core.Result;
 
     public interface IRequestDispatcher
     {
-        Task<(ReadOnlyMemory<byte> Buffer, HttpStatusCode StatusCode, string ContentType)> DispatchAsync(HttpRequest request);
+        Task<IActionResult> DispatchAsync(HttpRequest request);
     }
 }

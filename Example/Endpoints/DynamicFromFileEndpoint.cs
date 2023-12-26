@@ -6,6 +6,7 @@
     using MultithredRest.Core.Endpoint;
     using MultithredRest.Core.HttpServer;
     using MultithredRest.Core.RequestDispatcher;
+    using MultithredRest.Core.Result;
     using MultithredRest.Helpers;
 
     [RegistrateEndpoint]
@@ -22,11 +23,9 @@
 
         public override HttpMethod Method => HttpMethod.Post;
 
-        public override string HttpResponseContentType => "application/json";
-
         protected IRequestDispatcher RequestDispatcher { get => _serviceProvider.GetRequiredService<IRequestDispatcher>(); }
 
-        public override async Task<ReadOnlyMemory<byte>> GenerateResponseAsync(HttpRequest request, CancellationToken cancellationToken = default)
+        public override async Task<IActionResult> GenerateResponseAsync(HttpRequest request, CancellationToken cancellationToken = default)
         {
             using var file = new FileStream(@"Data/Dynamic.json", FileMode.Open);
             var parsedRequests = JsonSerializer.DeserializeAsyncEnumerable<HttpDynamicRequest>(file, cancellationToken: cancellationToken);
@@ -37,7 +36,7 @@
                 results.Add((await RequestDispatcher.DispatchAsync(parsedRequest?.ToHttpRequest(request) ?? throw new NullReferenceException("Null parsed"))).Buffer);
             }
 
-            return results.ConcatenateReadOnlyMemories(request.ContentEncoding.GetBytes("["), request.ContentEncoding.GetBytes(","), request.ContentEncoding.GetBytes("]"));
+            return Ok(results.ConcatenateReadOnlyMemories(request.ContentEncoding.GetBytes("["), request.ContentEncoding.GetBytes(","), request.ContentEncoding.GetBytes("]")));
         }
     }
 }

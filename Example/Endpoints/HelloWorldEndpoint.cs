@@ -1,12 +1,11 @@
 ﻿namespace Example.Endpoints
 {
-    using System;
     using System.Net.Http;
     using System.Threading.Tasks;
     using MultithredRest.Core.Attributes;
     using MultithredRest.Core.Endpoint;
     using MultithredRest.Core.HttpServer;
-    using MultithredRest.Helpers;
+    using MultithredRest.Core.Result;
 
     [RegistrateEndpoint]
     public class HelloWorldEndpoint : EndpointBase
@@ -15,11 +14,9 @@
 
         public override string Route => @"/helloworld";
 
-        public override string HttpResponseContentType => @"application/json";
-
-        public override async Task<ReadOnlyMemory<byte>> GenerateResponseAsync(HttpRequest request, CancellationToken cancellationToken = default)
+        public override async Task<IActionResult> GenerateResponseAsync(HttpRequest request, CancellationToken cancellationToken = default)
         {
-            return await new { Message = "Hello world!" }.SerializeJsonAsync(cancellationToken);
+            return await OkAsync(new { Message = "Hello world!" });
         }
     }
 }

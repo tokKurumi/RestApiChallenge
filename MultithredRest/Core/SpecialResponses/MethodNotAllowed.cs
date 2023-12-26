@@ -4,9 +4,9 @@
     using MultithredRest.Core.Endpoint;
     using MultithredRest.Core.HttpServer;
 
-    public class MethodNotAllowedResponse : SpecialResponseBase
+    public class MethodNotAllowed : SpecialResponseBase
     {
-        public MethodNotAllowedResponse(HttpRequest request, EndpointBase endpoint)
+        public MethodNotAllowed(HttpRequest request, EndpointBase endpoint)
         {
             RequestedMethod = request.HttpMethod;
             Endpoint = endpoint;

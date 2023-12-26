@@ -4,9 +4,9 @@
     using MultithredRest.Core.Endpoint;
     using MultithredRest.Core.HttpServer;
 
-    public class InternalServerErrorResponse : SpecialResponseBase
+    public class InternalServerError : SpecialResponseBase
     {
-        public InternalServerErrorResponse(HttpRequest request, EndpointBase endpoint, Exception exception)
+        public InternalServerError(HttpRequest request, EndpointBase endpoint, Exception exception)
         {
             Route = request.Route;
             Endpoint = endpoint;

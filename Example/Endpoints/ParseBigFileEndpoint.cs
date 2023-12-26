@@ -1,11 +1,11 @@
 ﻿using MultithredRest.Core.Attributes;
 using MultithredRest.Core.Endpoint;
 using MultithredRest.Core.HttpServer;
-using MultithredRest.Helpers;
 using System.Xml.Serialization;
 using Example.Models.Cities;
 using System.Xml;
 using Example.Data;
+using MultithredRest.Core.Result;
 
 namespace Example.Endpoints;
 
@@ -23,9 +23,7 @@ public class ParseBigFileEndpoint : EndpointBase
 
     public override HttpMethod Method => HttpMethod.Post;
 
-    public override string HttpResponseContentType => "application/json";
-
-    public override async Task<ReadOnlyMemory<byte>> GenerateResponseAsync(HttpRequest request, CancellationToken cancellationToken = default)
+    public override async Task<IActionResult> GenerateResponseAsync(HttpRequest request, CancellationToken cancellationToken = default)
     {
         string filePath = "Data/data.xml";
 
@@ -37,9 +35,9 @@ public class ParseBigFileEndpoint : EndpointBase
             await _dbContext.Cities.AddRangeAsync(cityAddresses.Cities);
             var countOfWritten = await _dbContext.SaveChangesAsync(cancellationToken);
 
-            return await new { Message = $"Succefully writen {countOfWritten} entries to database." }.SerializeJsonAsync(cancellationToken);
+            return await OkAsync(new { Message = $"Succefully writen {countOfWritten} entries to database." });
         }
 
-        return await new { Message = "Something went wrong" }.SerializeJsonAsync(cancellationToken);
+        return await BadRequestAsync(new { Message = "Something went wrong" });
     }
 }

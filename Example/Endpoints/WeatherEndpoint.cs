@@ -1,6 +1,5 @@
 ﻿namespace Example.Endpoints
 {
-    using System;
     using System.Net.Http;
     using System.Threading.Tasks;
     using Example.Models.WeatherApi;
@@ -8,7 +7,7 @@
     using MultithredRest.Core.Attributes;
     using MultithredRest.Core.Endpoint;
     using MultithredRest.Core.HttpServer;
-    using MultithredRest.Helpers;
+    using MultithredRest.Core.Result;
 
     [RegistrateEndpoint]
     public class WeatherEndpoint : EndpointBase
@@ -24,13 +23,11 @@
 
         public override string Route => @"/weather";
 
-        public override string HttpResponseContentType => "application/json";
-
-        public override async Task<ReadOnlyMemory<byte>> GenerateResponseAsync(HttpRequest request, CancellationToken cancellationToken = default)
+        public override async Task<IActionResult> GenerateResponseAsync(HttpRequest request, CancellationToken cancellationToken = default)
         {
             var body = await request.DeserializeBodyAsync<WeatherParam>(cancellationToken);
 
-            return await _weatherService.GetCityWeather(body.Postcode, body.CountryCode).SerializeJsonAsync(cancellationToken);
+            return await OkAsync(await _weatherService.GetCityWeather(body.Postcode, body.CountryCode));
         }
     }
 }

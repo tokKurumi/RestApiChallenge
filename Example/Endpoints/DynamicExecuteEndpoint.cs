@@ -8,6 +8,7 @@
     using MultithredRest.Core.Endpoint;
     using MultithredRest.Core.HttpServer;
     using MultithredRest.Core.RequestDispatcher;
+    using MultithredRest.Core.Result;
     using MultithredRest.Helpers;
 
     [RegistrateEndpoint]
@@ -24,11 +25,9 @@
 
         public override HttpMethod Method => HttpMethod.Post;
 
-        public override string HttpResponseContentType => "application/json";
-
         protected IRequestDispatcher RequestDispatcher { get => _serviceProvider.GetRequiredService<IRequestDispatcher>(); }
 
-        public override async Task<ReadOnlyMemory<byte>> GenerateResponseAsync(HttpRequest request, CancellationToken cancellationToken = default)
+        public override async Task<IActionResult> GenerateResponseAsync(HttpRequest request, CancellationToken cancellationToken = default)
         {
             var parsedRequests = request.DeserializeEnumerableBodyAsync<HttpDynamicRequest>(cancellationToken);
 
@@ -42,7 +41,7 @@
                 }
             }
 
-            return results.ConcatenateReadOnlyMemories(request.ContentEncoding.GetBytes("["), request.ContentEncoding.GetBytes(","), request.ContentEncoding.GetBytes("]"));
+            return Ok(results.ConcatenateReadOnlyMemories(request.ContentEncoding.GetBytes("["), request.ContentEncoding.GetBytes(","), request.ContentEncoding.GetBytes("]")));
         }
     }
 }

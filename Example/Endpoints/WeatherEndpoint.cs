@@ -12,7 +12,7 @@
     [RegistrateEndpoint]
     public class WeatherEndpoint : EndpointBase
     {
-        private IWeatherService _weatherService;
+        private readonly IWeatherService _weatherService;
 
         public WeatherEndpoint(IWeatherService weatherService)
         {

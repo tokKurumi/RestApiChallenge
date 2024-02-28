@@ -12,14 +12,10 @@ using MultithredRest.Core.Result;
 using MultithredRest.Helpers;
 
 [RegistrateEndpoint]
-public class DynamicExecuteEndpoint : EndpointBase
+public class DynamicExecuteEndpoint(IServiceProvider serviceProvider)
+    : EndpointBase
 {
-    private readonly IServiceProvider _serviceProvider;
-
-    public DynamicExecuteEndpoint(IServiceProvider serviceProvider)
-    {
-        _serviceProvider = serviceProvider;
-    }
+    private readonly IServiceProvider _serviceProvider = serviceProvider;
 
     public override string Route => @"/dynamic";
 
@@ -37,7 +33,6 @@ public class DynamicExecuteEndpoint : EndpointBase
             if (parsedRequest is not null)
             {
                 results.Add((await RequestDispatcher.DispatchAsync(parsedRequest.ToHttpRequest(request))).Buffer);
-
             }
         }
 

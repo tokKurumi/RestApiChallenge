@@ -1,12 +1,12 @@
 ﻿namespace Example.Endpoints;
 
+using System.Net.Http;
+using System.Threading;
+using System.Threading.Tasks;
 using MultithredRest.Core.Attributes;
 using MultithredRest.Core.Endpoint;
 using MultithredRest.Core.HttpServer;
 using MultithredRest.Core.Result;
-using System.Net.Http;
-using System.Threading;
-using System.Threading.Tasks;
 
 [RegistrateEndpoint]
 public class ExceptionEndpoint : EndpointBase

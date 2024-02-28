@@ -3,10 +3,10 @@
 using System.Text.Json;
 using Example.Models.WeatherApi;
 
-public class WeatherService : IDisposable, IWeatherService
+public class WeatherService(HttpClient api)
+    : IWeatherService
 {
-    private readonly HttpClient _api = new HttpClient() { BaseAddress = new Uri(@"https://api.openweathermap.org/") };
-    private bool _disposing = false;
+    private readonly HttpClient _api = api;
 
     public async Task<CityWeather?> GetCityWeather(string postCode, string countryCode, CancellationToken cancellationToken = default)
     {
@@ -20,24 +20,5 @@ public class WeatherService : IDisposable, IWeatherService
         return await JsonSerializer.DeserializeAsync<CityWeather>(
             await cityWeatherResponse.Content.ReadAsStreamAsync(cancellationToken),
             cancellationToken: cancellationToken);
-    }
-
-    public void Dispose()
-    {
-        Dispose(true);
-        GC.SuppressFinalize(this);
-    }
-
-    protected virtual void Dispose(bool disposing)
-    {
-        if (!_disposing)
-        {
-            if (disposing)
-            {
-                _api.Dispose();
-            }
-        }
-
-        _disposing = true;
     }
 }

@@ -15,6 +15,10 @@ var host = MultithreadRestHost
         });
 
         services.AddSingleton<IWeatherService, WeatherService>();
+        services.AddHttpClient<IWeatherService, WeatherService>(client =>
+        {
+            client.BaseAddress = new Uri(@"https://api.openweathermap.org/");
+        });
     })
     .Build();
 

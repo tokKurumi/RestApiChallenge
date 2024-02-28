@@ -1,21 +1,16 @@
-﻿using Example.Models.Cities;
+﻿namespace Example.Data;
+
+using Example.Models.Cities;
 using Microsoft.EntityFrameworkCore;
 
-namespace Example.Data;
-
-public class CityDbContext : DbContext
+public class CityDbContext
+    : DbContext
 {
     public CityDbContext(DbContextOptions<CityDbContext> options)
         : base(options)
     {
+        Database.EnsureCreated();
     }
 
     public DbSet<City> Cities { get; set; }
-
-    protected override void OnModelCreating(ModelBuilder modelBuilder)
-    {
-        base.OnModelCreating(modelBuilder);
-
-        Database.EnsureCreated();
-    }
 }

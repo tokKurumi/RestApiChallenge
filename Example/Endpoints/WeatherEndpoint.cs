@@ -10,14 +10,10 @@ using MultithredRest.Core.HttpServer;
 using MultithredRest.Core.Result;
 
 [RegistrateEndpoint]
-public class WeatherEndpoint : EndpointBase
+public class WeatherEndpoint(IWeatherService weatherService)
+    : EndpointBase
 {
-    private readonly IWeatherService _weatherService;
-
-    public WeatherEndpoint(IWeatherService weatherService)
-    {
-        _weatherService = weatherService;
-    }
+    private readonly IWeatherService _weatherService = weatherService;
 
     public override HttpMethod Method => HttpMethod.Post;
 
@@ -27,6 +23,6 @@ public class WeatherEndpoint : EndpointBase
     {
         var body = await request.DeserializeBodyAsync<WeatherParam>(cancellationToken);
 
-        return await OkAsync(await _weatherService.GetCityWeather(body.Postcode, body.CountryCode));
+        return await OkAsync(await _weatherService.GetCityWeather(body.Postcode, body.CountryCode, cancellationToken));
     }
 }

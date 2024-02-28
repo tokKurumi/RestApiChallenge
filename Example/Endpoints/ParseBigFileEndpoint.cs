@@ -1,23 +1,19 @@
-﻿using MultithredRest.Core.Attributes;
+﻿namespace Example.Endpoints;
+
+using System.Xml;
+using System.Xml.Serialization;
+using Example.Data;
+using Example.Models.Cities;
+using MultithredRest.Core.Attributes;
 using MultithredRest.Core.Endpoint;
 using MultithredRest.Core.HttpServer;
-using System.Xml.Serialization;
-using Example.Models.Cities;
-using System.Xml;
-using Example.Data;
 using MultithredRest.Core.Result;
 
-namespace Example.Endpoints;
-
 [RegistrateEndpoint]
-public class ParseBigFileEndpoint : EndpointBase
+public class ParseBigFileEndpoint(CityDbContext dbContext)
+    : EndpointBase
 {
-    private readonly CityDbContext _dbContext;
-
-    public ParseBigFileEndpoint(CityDbContext dbContext)
-    {
-        _dbContext = dbContext;
-    }
+    private readonly CityDbContext _dbContext = dbContext;
 
     public override string Route => @"/parse";
 
@@ -32,7 +28,7 @@ public class ParseBigFileEndpoint : EndpointBase
 
         if (serializer.Deserialize(reader) is CityAddresses cityAddresses && cityAddresses.Cities is not null)
         {
-            await _dbContext.Cities.AddRangeAsync(cityAddresses.Cities);
+            await _dbContext.Cities.AddRangeAsync(cityAddresses.Cities, cancellationToken);
             var countOfWritten = await _dbContext.SaveChangesAsync(cancellationToken);
 
             return await OkAsync(new { Message = $"Succefully writen {countOfWritten} entries to database." });

@@ -19,7 +19,7 @@ public static class AddEndpointsExtensions
                 return
                     endpointBaseType.IsAssignableFrom(type)
                     && type.GetCustomAttributes(typeof(RegistrateEndpointAttribute), true).Length > 0;
-            }) ?? Enumerable.Empty<Type>();
+            }) ?? [];
 
         foreach (var type in typesWithSingletonAttribute)
         {

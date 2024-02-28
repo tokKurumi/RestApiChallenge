@@ -1,65 +1,55 @@
 ﻿namespace MultithredRest.Core.HttpServer;
 
+using System;
 using System.Net;
+using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using MultithredRest.Core.RequestDispatcher;
 using MultithredRest.Helpers;
 
-public class HttpServer : IHttpServer
+public class HttpServer(IRequestDispatcher dispatcher, ILogger<HttpServer> logger)
+    : IHttpServer
 {
-    private readonly IRequestDispatcher _dispatcher;
-    private readonly ILogger<HttpServer> _logger;
-    private readonly HttpListener _listener = new HttpListener();
-    private bool _disposing = false;
+    private readonly IRequestDispatcher _dispatcher = dispatcher ?? throw new ArgumentNullException(nameof(dispatcher));
+    private readonly ILogger<HttpServer> _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+    private readonly HttpListener _listener = new();
+    private bool _isDisposed;
 
-    public HttpServer(IRequestDispatcher dispatcher, ILogger<HttpServer> logger)
-    {
-        _dispatcher = dispatcher;
-        _logger = logger;
-    }
+    public string Protocol { get; set; } = "http";
 
-    public string Protocol { get; set; } = @"http";
-
-    public string Host { get; init; } = @"localhost";
+    public string Host { get; init; } = "localhost";
 
     public int Port { get; init; } = 8080;
 
-    public bool IsWorking { get; private set; } = false;
-
-    public async Task StartAsync()
+    public async Task StartAsync(CancellationToken stoppingToken = default)
     {
-        _listener.Prefixes.Add(@$"{Protocol}://{Host}:{Port}/");
+        if (_listener.IsListening)
+        {
+            _logger.LogInformation("HttpServer is already running.");
+            return;
+        }
+
+        _listener.Prefixes.Add($"{Protocol}://{Host}:{Port}/");
         _listener.Start();
-        _logger.LogInformation("HttpServer has succefully started on {Protocol}://{Host}:{Port}/", Protocol, Host, Port);
 
-        IsWorking = true;
-        _logger.LogInformation("HttpServer working status changed to {WorkingStatus}", IsWorking);
+        _logger.LogInformation("HttpServer has successfully started on {Protocol}://{Host}:{Port}/", Protocol, Host, Port);
 
-        await StartConnectionHandlingAsync();
+        await StartConnectionHandlingAsync(stoppingToken);
     }
 
     public void Stop()
     {
-        _listener.Stop();
-        _logger.LogInformation("HttpServer has succefully stoped");
-
-        IsWorking = false;
-        _logger.LogInformation("HttpServer working status changed to {WorkingStatus}", IsWorking);
-    }
-
-    public void Close()
-    {
-        if (IsWorking)
+        if (!_listener.IsListening)
         {
-            IsWorking = false;
-            _logger.LogInformation("HttpServer working status changed to {WorkingStatus}", IsWorking);
+            _logger.LogInformation("HttpServer is not running.");
         }
 
-        _listener.Close();
-        _logger.LogInformation("HttpServer has succefully closed connections");
+        _listener.Stop();
+        _logger.LogInformation("HttpServer has successfully stopped receiving new requests and terminated all outgoing requests");
     }
 
-    public void Dispose() // dispose паттерн
+    public void Dispose()
     {
         Dispose(true);
         GC.SuppressFinalize(this);
@@ -67,25 +57,43 @@ public class HttpServer : IHttpServer
 
     protected virtual void Dispose(bool disposing)
     {
-        if (!_disposing)
+        if (_isDisposed)
         {
-            if (disposing)
-            {
-                Close();
-            }
+            return;
         }
 
-        _disposing = true;
+        if (disposing)
+        {
+            // free managed resources
+            _listener.Close();
+        }
+
+        _isDisposed = true;
     }
 
-    private async Task StartConnectionHandlingAsync()
+    private async Task StartConnectionHandlingAsync(CancellationToken stoppingToken = default)
     {
-        _logger.LogInformation("HttpServer has started handeling incoming connections");
+        _logger.LogInformation("HttpServer has started handling incoming connections");
 
-        while (IsWorking)
+        while (_listener.IsListening && !stoppingToken.IsCancellationRequested)
         {
-            var context = await _listener.GetContextAsync();
-            _ = Task.Run(() => HandleRequestAsync(context));
+            try
+            {
+                var context = await _listener.GetContextAsync();
+                await Task.Run(() => HandleRequestAsync(context), stoppingToken);
+            }
+            catch (HttpListenerException)
+            {
+                // Handle exception when stopping the listener
+                if (!_listener.IsListening && stoppingToken.IsCancellationRequested)
+                {
+                    break;
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error handling request");
+            }
         }
     }
 
@@ -103,6 +111,10 @@ public class HttpServer : IHttpServer
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error handling request");
+        }
+        finally
+        {
+            context.Response.OutputStream.Close();
         }
     }
 }

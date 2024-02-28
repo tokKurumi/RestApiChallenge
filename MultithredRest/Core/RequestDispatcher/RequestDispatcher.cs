@@ -6,16 +6,11 @@ using MultithredRest.Core.HttpServer;
 using MultithredRest.Core.Result;
 using MultithredRest.Core.SpecialResponses;
 
-public class RequestDispatcher : IRequestDispatcher
+public class RequestDispatcher(ILogger<RequestDispatcher> logger, IEndpointsRoutes endpoints)
+    : IRequestDispatcher
 {
-    private readonly ILogger<RequestDispatcher> _logger;
-    private readonly IEndpointsRoutes _endpoints;
-
-    public RequestDispatcher(ILogger<RequestDispatcher> logger, IEndpointsRoutes endpoints)
-    {
-        _logger = logger;
-        _endpoints = endpoints;
-    }
+    private readonly ILogger<RequestDispatcher> _logger = logger;
+    private readonly IEndpointsRoutes _endpoints = endpoints;
 
     public async Task<IActionResult> DispatchAsync(HttpRequest request)
     {

@@ -1,15 +1,11 @@
 ﻿namespace MultithredRest.Core.Result;
 
+using System.Net;
 using MultithredRest.Core.SpecialResponses;
 using MultithredRest.Helpers;
-using System.Net;
 
 public class ActionResult : IActionResult
 {
-    public ActionResult()
-    {
-    }
-
     public ActionResult(ReadOnlyMemory<byte> buffer, HttpStatusCode statusCode, string contentType)
     {
         Buffer = buffer;
@@ -17,9 +13,13 @@ public class ActionResult : IActionResult
         ContentType = contentType;
     }
 
-    public ReadOnlyMemory<byte> Buffer { get; private set; }
+    private ActionResult()
+    {
+    }
 
-    public HttpStatusCode StatusCode { get; private set; }
+    public ReadOnlyMemory<byte> Buffer { get; private set; } = default;
+
+    public HttpStatusCode StatusCode { get; private set; } = default;
 
     public string ContentType { get; private set; } = string.Empty;
 

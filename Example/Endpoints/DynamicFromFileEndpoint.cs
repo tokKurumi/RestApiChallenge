@@ -10,14 +10,10 @@ using MultithredRest.Core.Result;
 using MultithredRest.Helpers;
 
 [RegistrateEndpoint]
-public class DynamicFromFileEndpoint : EndpointBase
+public class DynamicFromFileEndpoint(IServiceProvider serviceProvider)
+    : EndpointBase
 {
-    private IServiceProvider _serviceProvider;
-
-    public DynamicFromFileEndpoint(IServiceProvider serviceProvider)
-    {
-        _serviceProvider = serviceProvider;
-    }
+    private readonly IServiceProvider _serviceProvider = serviceProvider;
 
     public override string Route => @"/dynamicFromFile";
 

@@ -1,7 +1,7 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-using System.Xml.Serialization;
+﻿namespace Example.Models.Cities;
 
-namespace Example.Models.Cities;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Xml.Serialization;
 
 [XmlRoot(ElementName = "OBJECT")]
 public class City
@@ -43,7 +43,7 @@ public class City
     [XmlAttribute(AttributeName = "UPDATEDATE")]
     public DateTimeOffset UpdateDateOffset
     {
-        get => new DateTimeOffset(UpdateDate, TimeSpan.Zero);
+        get => new(UpdateDate, TimeSpan.Zero);
         set => UpdateDate = value.UtcDateTime;
     }
 
@@ -54,7 +54,7 @@ public class City
     [XmlAttribute(AttributeName = "STARTDATE")]
     public DateTimeOffset StartDateOffset
     {
-        get => new DateTimeOffset(StartDate, TimeSpan.Zero);
+        get => new(StartDate, TimeSpan.Zero);
         set => StartDate = value.UtcDateTime;
     }
 
@@ -65,7 +65,7 @@ public class City
     [XmlAttribute(AttributeName = "ENDDATE")]
     public DateTimeOffset EndDateOffset
     {
-        get => new DateTimeOffset(EndDate, TimeSpan.Zero);
+        get => new(EndDate, TimeSpan.Zero);
         set => EndDate = value.UtcDateTime;
     }
 

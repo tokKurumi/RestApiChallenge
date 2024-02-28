@@ -1,10 +1,10 @@
-﻿using System.Xml.Serialization;
+﻿namespace Example.Models.Cities;
 
-namespace Example.Models.Cities;
+using System.Xml.Serialization;
 
 [XmlRoot(ElementName = "ADDRESSOBJECTS")]
 public class CityAddresses
 {
     [XmlElement(ElementName = "OBJECT")]
-    public List<City> Cities { get; set; } = new List<City>();
+    public List<City> Cities { get; set; } = [];
 }

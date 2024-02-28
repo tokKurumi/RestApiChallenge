@@ -1,21 +1,20 @@
-﻿namespace MultithredRest.Core.Endpoint
+﻿namespace MultithredRest.Core.Endpoint;
+
+public class EndpointsRoutes : IEndpointsRoutes
 {
-    public class EndpointsRoutes : IEndpointsRoutes
+    private readonly List<EndpointBase> _endpoints;
+
+    public EndpointsRoutes(IEnumerable<EndpointBase> endpoints)
     {
-        private readonly List<EndpointBase> _endpoints;
+        _endpoints = new List<EndpointBase>(endpoints);
 
-        public EndpointsRoutes(IEnumerable<EndpointBase> endpoints)
+        Instance = new SortedDictionary<string, EndpointBase>(StringComparer.OrdinalIgnoreCase);
+
+        foreach (var endpoint in _endpoints)
         {
-            _endpoints = new List<EndpointBase>(endpoints);
-
-            Instance = new SortedDictionary<string, EndpointBase>(StringComparer.OrdinalIgnoreCase);
-
-            foreach (var endpoint in _endpoints)
-            {
-                Instance[endpoint.Route] = endpoint;
-            }
+            Instance[endpoint.Route] = endpoint;
         }
-
-        public IDictionary<string, EndpointBase> Instance { get; init; }
     }
+
+    public IDictionary<string, EndpointBase> Instance { get; init; }
 }

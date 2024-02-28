@@ -1,10 +1,9 @@
-﻿namespace Example.Models.WeatherApi
-{
-    using System.Text.Json.Serialization;
+﻿namespace Example.Models.WeatherApi;
 
-    public class Clouds
-    {
-        [JsonPropertyName("all")]
-        public int All { get; set; }
-    }
+using System.Text.Json.Serialization;
+
+public class Clouds
+{
+    [JsonPropertyName("all")]
+    public int All { get; set; }
 }

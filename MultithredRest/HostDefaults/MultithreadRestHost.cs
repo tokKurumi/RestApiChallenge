@@ -15,22 +15,15 @@ public static class MultithreadRestHost
             .ConfigureServices(services =>
             {
                 services
-                    .AddSingleton<IApplication, Application>()
                     .AddSingleton<IHttpServer, HttpServer>()
                     .AddSingleton<IRequestDispatcher, RequestDispatcher>()
                     .AddSingleton<IEndpointsRoutes, EndpointsRoutes>()
                     .AddEndpoints();
+
+                services
+                    .AddHostedService<Application>();
             });
 
         return host;
-    }
-
-    public static void RunConfigured(this IHost host)
-    {
-        host.Services
-            .GetRequiredService<IApplication>()
-            .Run();
-
-        host.Run();
     }
 }

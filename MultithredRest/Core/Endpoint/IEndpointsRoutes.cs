@@ -1,7 +1,6 @@
-﻿namespace MultithredRest.Core.Endpoint
+﻿namespace MultithredRest.Core.Endpoint;
+
+public interface IEndpointsRoutes
 {
-    public interface IEndpointsRoutes
-    {
-        IDictionary<string, EndpointBase> Instance { get; init; }
-    }
+    IDictionary<string, EndpointBase> Instance { get; init; }
 }

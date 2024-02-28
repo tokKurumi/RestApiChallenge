@@ -1,10 +1,9 @@
-﻿namespace MultithredRest.Core.RequestDispatcher
-{
-    using MultithredRest.Core.HttpServer;
-    using MultithredRest.Core.Result;
+﻿namespace MultithredRest.Core.RequestDispatcher;
 
-    public interface IRequestDispatcher
-    {
-        Task<IActionResult> DispatchAsync(HttpRequest request);
-    }
+using MultithredRest.Core.HttpServer;
+using MultithredRest.Core.Result;
+
+public interface IRequestDispatcher
+{
+    Task<IActionResult> DispatchAsync(HttpRequest request);
 }

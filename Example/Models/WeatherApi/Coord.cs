@@ -1,13 +1,12 @@
-﻿namespace Example.Models.WeatherApi
+﻿namespace Example.Models.WeatherApi;
+
+using System.Text.Json.Serialization;
+
+public class Coord
 {
-    using System.Text.Json.Serialization;
+    [JsonPropertyName("lon")]
+    public double Lon { get; set; }
 
-    public class Coord
-    {
-        [JsonPropertyName("lon")]
-        public double Lon { get; set; }
-
-        [JsonPropertyName("lat")]
-        public double Lat { get; set; }
-    }
+    [JsonPropertyName("lat")]
+    public double Lat { get; set; }
 }

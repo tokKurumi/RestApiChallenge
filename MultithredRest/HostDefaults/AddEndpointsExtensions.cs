@@ -1,30 +1,29 @@
-﻿namespace MultithredRest.HostDefaults
+﻿namespace MultithredRest.HostDefaults;
+
+using System.Reflection;
+using Microsoft.Extensions.DependencyInjection;
+using MultithredRest.Core.Attributes;
+using MultithredRest.Core.Endpoint;
+
+public static class AddEndpointsExtensions
 {
-    using System.Reflection;
-    using Microsoft.Extensions.DependencyInjection;
-    using MultithredRest.Core.Attributes;
-    using MultithredRest.Core.Endpoint;
-
-    public static class AddEndpointsExtensions
+    public static void AddEndpoints(this IServiceCollection services)
     {
-        public static void AddEndpoints(this IServiceCollection services)
-        {
-            var endpointBaseType = typeof(EndpointBase);
+        var endpointBaseType = typeof(EndpointBase);
 
-            var typesWithSingletonAttribute = Assembly
-                .GetEntryAssembly()
-                ?.GetTypes()
-                .Where(type =>
-                {
-                    return
-                        endpointBaseType.IsAssignableFrom(type)
-                        && type.GetCustomAttributes(typeof(RegistrateEndpointAttribute), true).Length > 0;
-                }) ?? Enumerable.Empty<Type>();
-
-            foreach (var type in typesWithSingletonAttribute)
+        var typesWithSingletonAttribute = Assembly
+            .GetEntryAssembly()
+            ?.GetTypes()
+            .Where(type =>
             {
-                services.AddSingleton(endpointBaseType, type);
-            }
+                return
+                    endpointBaseType.IsAssignableFrom(type)
+                    && type.GetCustomAttributes(typeof(RegistrateEndpointAttribute), true).Length > 0;
+            }) ?? Enumerable.Empty<Type>();
+
+        foreach (var type in typesWithSingletonAttribute)
+        {
+            services.AddSingleton(endpointBaseType, type);
         }
     }
 }

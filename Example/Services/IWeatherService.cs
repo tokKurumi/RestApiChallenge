@@ -1,11 +1,10 @@
-﻿namespace Example.Services
+﻿namespace Example.Services;
+
+using Example.Models.WeatherApi;
+
+public interface IWeatherService
 {
-    using Example.Models.WeatherApi;
+    void Dispose();
 
-    public interface IWeatherService
-    {
-        void Dispose();
-
-        Task<CityWeather?> GetCityWeather(string postCode, string countryCode, CancellationToken cancellationToken = default);
-    }
+    Task<CityWeather?> GetCityWeather(string postCode, string countryCode, CancellationToken cancellationToken = default);
 }

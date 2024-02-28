@@ -11,11 +11,11 @@ var host = MultithreadRestHost
     {
         services.AddDbContext<CityDbContext>(options =>
         {
-            options.UseNpgsql("Host=localhost;Port=5432;Database=MathZ;Username=kurumi;Password=root");
+            options.UseInMemoryDatabase("TestDB");
         });
 
         services.AddSingleton<IWeatherService, WeatherService>();
     })
     .Build();
 
-host.RunConfigured();
+await host.RunAsync();

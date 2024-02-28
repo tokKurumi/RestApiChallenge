@@ -1,9 +1,8 @@
-﻿namespace MultithredRest.Core.SpecialResponses
-{
-    using System.Net;
+﻿namespace MultithredRest.Core.SpecialResponses;
 
-    public abstract class SpecialResponseBase
-    {
-        public HttpStatusCode StatusCode { get; set; }
-    }
+using System.Net;
+
+public abstract class SpecialResponseBase
+{
+    public HttpStatusCode StatusCode { get; set; }
 }

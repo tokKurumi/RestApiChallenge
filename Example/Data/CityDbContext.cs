@@ -12,8 +12,10 @@ public class CityDbContext : DbContext
 
     public DbSet<City> Cities { get; set; }
 
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        base.OnConfiguring(optionsBuilder);
+        base.OnModelCreating(modelBuilder);
+
+        Database.EnsureCreated();
     }
 }

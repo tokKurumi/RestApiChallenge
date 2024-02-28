@@ -1,29 +1,25 @@
-﻿namespace MultithredRest.Core.Application
+﻿namespace MultithredRest.Core.Application;
+
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using MultithredRest.Core.HttpServer;
+using System.Threading;
+using System.Threading.Tasks;
+
+public class Application : BackgroundService
 {
-    using Microsoft.Extensions.Logging;
-    using MultithredRest.Core.HttpServer;
+    private readonly ILogger<Application> _logger;
+    private readonly IHttpServer _server;
 
-    public class Application : IApplication
+    public Application(ILogger<Application> logger, IHttpServer server)
     {
-        private readonly ILogger<Application> _logger;
-        private readonly IHttpServer _server;
+        _logger = logger;
+        _server = server;
+    }
 
-        public Application(ILogger<Application> logger, IHttpServer server)
-        {
-            _logger = logger;
-            _server = server;
-        }
-
-        public void Run()
-        {
-            _logger.LogInformation("Application has succefully started");
-            _server.StartAsync();
-        }
-
-        public void Stop()
-        {
-            _server.Stop();
-            _logger.LogInformation("Application has succefully stopped");
-        }
+    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+    {
+        _logger.LogInformation("Application has succefully started");
+        await _server.StartAsync();
     }
 }

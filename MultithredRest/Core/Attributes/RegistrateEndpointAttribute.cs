@@ -1,7 +1,6 @@
-﻿namespace MultithredRest.Core.Attributes
+﻿namespace MultithredRest.Core.Attributes;
+
+[AttributeUsage(AttributeTargets.Class, Inherited = false, AllowMultiple = false)]
+public class RegistrateEndpointAttribute : Attribute
 {
-    [AttributeUsage(AttributeTargets.Class, Inherited = false, AllowMultiple = false)]
-    public class RegistrateEndpointAttribute : Attribute
-    {
-    }
 }

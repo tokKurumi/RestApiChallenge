@@ -1,24 +1,23 @@
-﻿namespace MultithredRest.Core.SpecialResponses
+﻿namespace MultithredRest.Core.SpecialResponses;
+
+using System.Net;
+using MultithredRest.Core.Endpoint;
+using MultithredRest.Core.HttpServer;
+
+public class InternalServerError : SpecialResponseBase
 {
-    using System.Net;
-    using MultithredRest.Core.Endpoint;
-    using MultithredRest.Core.HttpServer;
-
-    public class InternalServerError : SpecialResponseBase
+    public InternalServerError(HttpRequest request, EndpointBase endpoint, Exception exception)
     {
-        public InternalServerError(HttpRequest request, EndpointBase endpoint, Exception exception)
-        {
-            Route = request.Route;
-            Endpoint = endpoint;
-            StackTrace = exception.StackTrace;
+        Route = request.Route;
+        Endpoint = endpoint;
+        StackTrace = exception.StackTrace;
 
-            StatusCode = HttpStatusCode.InternalServerError;
-        }
-
-        public string Route { get; set; }
-
-        public EndpointBase Endpoint { get; set; }
-
-        public string? StackTrace { get; set; }
+        StatusCode = HttpStatusCode.InternalServerError;
     }
+
+    public string Route { get; set; }
+
+    public EndpointBase Endpoint { get; set; }
+
+    public string? StackTrace { get; set; }
 }

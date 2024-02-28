@@ -1,9 +1,8 @@
-﻿namespace Example.Models.WeatherApi
-{
-    public class WeatherParam
-    {
-        public string Postcode { get; set; } = string.Empty;
+﻿namespace Example.Models.WeatherApi;
 
-        public string CountryCode { get; set; } = string.Empty;
-    }
+public class WeatherParam
+{
+    public string Postcode { get; set; } = string.Empty;
+
+    public string CountryCode { get; set; } = string.Empty;
 }

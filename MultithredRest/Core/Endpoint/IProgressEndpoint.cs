@@ -1,7 +1,6 @@
-﻿namespace MultithredRest.Core.Endpoint
+﻿namespace MultithredRest.Core.Endpoint;
+
+public interface IProgressEndpoint
 {
-    public interface IProgressEndpoint
-    {
-        int CurrentProgress { get; }
-    }
+    int CurrentProgress { get; }
 }

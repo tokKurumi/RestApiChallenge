@@ -1,17 +1,16 @@
-﻿namespace MultithredRest.Core.HttpServer
+﻿namespace MultithredRest.Core.HttpServer;
+
+public interface IHttpServer : IDisposable
 {
-    public interface IHttpServer : IDisposable
-    {
-        string Protocol { get; set; }
+    string Protocol { get; set; }
 
-        string Host { get; init; }
+    string Host { get; init; }
 
-        bool IsWorking { get; }
+    bool IsWorking { get; }
 
-        int Port { get; init; }
+    int Port { get; init; }
 
-        Task StartAsync();
+    Task StartAsync();
 
-        void Stop();
-    }
+    void Stop();
 }

@@ -33,7 +33,7 @@ using MultithreadRest.HostDefaults;
 var host = MultithreadRestHost
     .CreateDefaultBuilder().Build();
 
-host.RunConfigured();
+await host.RunAsync();
 ```
 2. Define your custom Endpoint in a new file:
 ```csharp
@@ -101,6 +101,7 @@ You can easily add dependency injection containers directly to your application!
 ```csharp
 using Example.Data;
 using Example.Services;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using MultithredRest.HostDefaults;
@@ -110,43 +111,38 @@ var host = MultithreadRestHost
     .ConfigureServices(services =>
     {
         services.AddSingleton<IWeatherService, WeatherService>();
+        services.AddHttpClient<IWeatherService, WeatherService>(client =>
+        {
+            client.BaseAddress = new Uri(@"https://api.openweathermap.org/");
+        });
     })
     .Build();
 
-host.RunConfigured();
+await host.RunAsync();
 ```
 ```csharp
-namespace Example.Endpoints
+namespace Example.Services;
+
+using System.Text.Json;
+using Example.Models.WeatherApi;
+
+public class WeatherService(HttpClient api)
+    : IWeatherService
 {
-    using System.Net.Http;
-    using System.Threading.Tasks;
-    using Example.Models.WeatherApi;
-    using Example.Services;
-    using MultithredRest.Core.Attributes;
-    using MultithredRest.Core.Endpoint;
-    using MultithredRest.Core.HttpServer;
-    using MultithredRest.Core.Result;
+    private readonly HttpClient _api = api;
 
-    [RegistrateEndpoint]
-    public class WeatherEndpoint : EndpointBase
+    public async Task<CityWeather?> GetCityWeather(string postCode, string countryCode, CancellationToken cancellationToken = default)
     {
-        private readonly IWeatherService _weatherService;
+        var cityWeatherResponse = await _api.GetAsync(@$"data/2.5/weather?q={postCode},{countryCode}&APPID={Resources.Weather.WeatherApi.key}", cancellationToken);
 
-        public WeatherEndpoint(IWeatherService weatherService)
+        if (!cityWeatherResponse.IsSuccessStatusCode)
         {
-            _weatherService = weatherService;
+            throw new HttpRequestException("Invalid request");
         }
 
-        public override HttpMethod Method => HttpMethod.Post;
-
-        public override string Route => @"/weather";
-
-        public override async Task<IActionResult> GenerateResponseAsync(HttpRequest request, CancellationToken cancellationToken = default)
-        {
-            var body = await request.DeserializeBodyAsync<WeatherParam>(cancellationToken);
-
-            return await OkAsync(await _weatherService.GetCityWeather(body.Postcode, body.CountryCode));
-        }
+        return await JsonSerializer.DeserializeAsync<CityWeather>(
+            await cityWeatherResponse.Content.ReadAsStreamAsync(cancellationToken),
+            cancellationToken: cancellationToken);
     }
 }
 ```
@@ -168,14 +164,10 @@ using MultithredRest.Core.Result;
 using MultithredRest.Helpers;
 
 [RegistrateEndpoint]
-public class DynamicExecuteEndpoint : EndpointBase
+public class DynamicExecuteEndpoint(IServiceProvider serviceProvider)
+    : EndpointBase
 {
-    private readonly IServiceProvider _serviceProvider;
-
-    public DynamicExecuteEndpoint(IServiceProvider serviceProvider)
-    {
-        _serviceProvider = serviceProvider;
-    }
+    private readonly IServiceProvider _serviceProvider = serviceProvider;
 
     public override string Route => @"/dynamic";
 
@@ -193,7 +185,6 @@ public class DynamicExecuteEndpoint : EndpointBase
             if (parsedRequest is not null)
             {
                 results.Add((await RequestDispatcher.DispatchAsync(parsedRequest.ToHttpRequest(request))).Buffer);
-
             }
         }
 
